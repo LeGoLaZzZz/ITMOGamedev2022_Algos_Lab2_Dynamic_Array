@@ -112,46 +112,60 @@ public:
 
     int insert(const T &value) {
 
-        if (_size == _capacity) ExpandCapacity();
+        if (_size == _capacity) {
+            _capacity *= 2;
 
-        T *p = (T *) malloc((_size + 1) * sizeof(T));
+            T *p = (T *) malloc((_capacity) * sizeof(T));
+            for (int i = 0; i < size(); ++i) {
+                new(p + i) T(std::move(_data[i]));
+            }
 
-        for (int i = 0; i < _size; ++i) {
-            new(p + i) T(std::move(_data[i]));
+            for (int i = 0; i < _size; ++i) {
+                _data[i].~T();
+            }
+            free(_data);
+
+            _data = p;
         }
 
-        for (int i = 0; i < _size; ++i) {
-            _data[i].~T();
-        }
-        free(_data);
-
-        _data = p;
         new(_data + _size) T(value);
         _size += 1;
         return _size - 1;
     }
 
+
     int insert(int index, const T &value) {
-        if (_size == _capacity) ExpandCapacity();
 
-        T *p = (T *) malloc((_size + 1) * sizeof(T));
+        if (_size == _capacity) {
+            _capacity *= 2;
 
-        for (int i = 0; i < index; ++i) {
-            new(p + i) T(std::move(_data[i]));
+            T *p = (T *) malloc((_capacity) * sizeof(T));
+
+            for (int i = 0; i < index; ++i) {
+                new(p + i) T(std::move(_data[i]));
+            }
+            new(p + index) T(value);
+
+            for (int i = index + 1; i < _size + 1; ++i) {
+                new(p + i) T(std::move(_data[i - 1]));
+            }
+
+            for (int i = 0; i < _size; ++i) {
+                _data[i].~T();
+            }
+            free(_data);
+
+            _data = p;
+
+
+        } else {
+
+            for (int i = index + 1; i < _size + 1; ++i) {
+                new(_data + i) T(std::move(_data[i - 1]));
+            }
+            new(_data + index) T(value);
 
         }
-        new(p + index) T(value);
-
-        for (int i = index + 1; i < _size + 1; ++i) {
-            new(p + i) T(std::move(_data[i - 1]));
-        }
-
-        for (int i = 0; i < _size; ++i) {
-            _data[i].~T();
-        }
-        free(_data);
-
-        _data = p;
         _size += 1;
 
         return index;
@@ -194,21 +208,6 @@ public:
         return _capacity;
     }
 
-    void ExpandCapacity() {
-        _capacity *= 2;
-
-        T *p = (T *) malloc((_capacity) * sizeof(T));
-        for (int i = 0; i < size(); ++i) {
-            new(p + i) T(std::move(_data[i]));
-        }
-
-        for (int i = 0; i < _size; ++i) {
-            _data[i].~T();
-        }
-        free(_data);
-
-        _data = p;
-    }
 
     class Iterator {
         int _curElementId;
