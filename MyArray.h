@@ -2,6 +2,7 @@
 #define LAB2ARRAY_MYARRAY_H
 
 #include <utility>
+#include <iostream>
 
 template<typename T>
 class MyArray final {
@@ -14,13 +15,13 @@ public:
     MyArray() {
         _size = 0;
         _capacity = 8;
-        _data =(T *) malloc(_capacity * sizeof(T));
+        _data = (T *) malloc(_capacity * sizeof(T));
     }
 
     MyArray(int capacity) {
         _size = 0;
         _capacity = capacity;
-        _data =(T *) malloc(_capacity * sizeof(T));
+        _data = (T *) malloc(_capacity * sizeof(T));
     }
 
     ~MyArray() {
@@ -34,7 +35,7 @@ public:
     MyArray(const MyArray &other) {
         _size = other._size;
         _capacity = other._capacity;
-        _data =(T *) malloc(_capacity * sizeof(T));
+        _data = (T *) malloc(_capacity * sizeof(T));
 
         for (int i = 0; i < _size; ++i) {
             new(_data + i) T(other._data[i]);
@@ -44,35 +45,49 @@ public:
 
     MyArray(MyArray &&other) {
         _size = other._size;
+        _capacity = other._capacity;
         _data = other._data;
         other._data = nullptr;
         other._size = 0;
     }
 
-    MyArray &operator=(const MyArray &other) {
+////    вариант без copyswap
+//    MyArray &operator=(const MyArray &other) {
+//        if (this != &other) {
+//
+//            for (int i = 0; i < _size; ++i) {
+//                _data[i].~T();
+//            }
+//            free(_data);
+//
+//            _size = other._size;
+//            _capacity = other._capacity;
+//            _data = (T *)malloc(_capacity * sizeof(T));
+//
+//            for (int i = 0; i < _size; ++i) {
+//                _data[i] = other._data[i];
+//            }
+//
+//            return *this;
+//        }
+//    }
+
+////    конфликтует с перемещающим=
+//    MyArray &operator=(MyArray other) {
+//        std::swap(_data, other._data);
+//        std::swap(_size, other._size);
+//        std::swap(_capacity, other._capacity);
+//        return *this;
+//    }
+
+    MyArray &operator=(MyArray &other) {
         if (this != &other) {
-
-            for (int i = 0; i < _size; ++i) {
-                _data[i].~T();
-            }
-            free(_data);
-
-            _size = other._size;
-            _capacity = other._capacity;
-            _data = (T *)malloc(_capacity * sizeof(T));
-
-            for (int i = 0; i < _size; ++i) {
-                _data[i] = other._data[i];
-            }
-
+            MyArray stackOther = other;
+            std::swap(_data, stackOther._data);
+            std::swap(_size, stackOther._size);
+            std::swap(_capacity, stackOther._capacity);
             return *this;
         }
-    }
-
-    MyArray &operator=(MyArray other) {
-        std::swap(_data, other._data);
-        std::swap(_size, other._size);
-        return *this;
     }
 
     MyArray &operator=(MyArray &&other) noexcept {
@@ -83,12 +98,14 @@ public:
             }
             free(_data);
 
-
             _size = other._size;
             _data = other._data;
+            _capacity = other._capacity;
 
             other._data = nullptr;
             other._size = 0;
+
+            return *this;
         }
     }
 
@@ -97,7 +114,7 @@ public:
 
         if (_size == _capacity) ExpandCapacity();
 
-        T *p = (T *)malloc((_size + 1) * sizeof(T));
+        T *p = (T *) malloc((_size + 1) * sizeof(T));
 
         for (int i = 0; i < _size; ++i) {
             new(p + i) T(std::move(_data[i]));
@@ -111,21 +128,22 @@ public:
         _data = p;
         new(_data + _size) T(value);
         _size += 1;
-        return _size-1;
+        return _size - 1;
     }
 
     int insert(int index, const T &value) {
         if (_size == _capacity) ExpandCapacity();
 
-        T *p = (T *)malloc((_size + 1) * sizeof(T));
+        T *p = (T *) malloc((_size + 1) * sizeof(T));
 
         for (int i = 0; i < index; ++i) {
             new(p + i) T(std::move(_data[i]));
+
         }
         new(p + index) T(value);
 
         for (int i = index + 1; i < _size + 1; ++i) {
-            new(p + i) T(std::move(_data[i]));
+            new(p + i) T(std::move(_data[i - 1]));
         }
 
         for (int i = 0; i < _size; ++i) {
@@ -134,7 +152,6 @@ public:
         free(_data);
 
         _data = p;
-        new(_data + _size) T(value);
         _size += 1;
 
         return index;
@@ -142,13 +159,13 @@ public:
 
     void remove(int index) {
 
-        T *p = (T *)malloc((_size - 1) * sizeof(T));
+        T *p = (T *) malloc((_size - 1) * sizeof(T));
 
         for (int i = 0; i < index; ++i) {
             new(p + i) T(std::move(_data[i]));
         }
 
-        for (int i = index; i < _size - 1; ++i) {
+        for (int i = index + 1; i < _size; ++i) {
             new(p + i - 1) T(std::move(_data[i]));
         }
 
@@ -173,39 +190,71 @@ public:
         return _size;
     }
 
-    void ExpandCapacity() {
+    int capacity() const {
+        return _capacity;
+    }
 
+    void ExpandCapacity() {
+        _capacity *= 2;
+
+        T *p = (T *) malloc((_capacity) * sizeof(T));
+        for (int i = 0; i < size(); ++i) {
+            new(p + i) T(std::move(_data[i]));
+        }
+
+        for (int i = 0; i < _size; ++i) {
+            _data[i].~T();
+        }
+        free(_data);
+
+        _data = p;
     }
 
     class Iterator {
         int _curElementId;
         bool _isReversed;
-        MyArray<T> * myArray;
+        MyArray<T> *myArrayPtr;
+//        T *curPtr;
 
     public:
-        Iterator(MyArray<T> * other, bool isReversed) {
-            myArray = other;
+        Iterator(MyArray<T> *other, bool isReversed) {
+            myArrayPtr = other;
             _isReversed = isReversed;
-            if (_isReversed)_curElementId = myArray->size() - 1;
-            else _curElementId = 0;
+            if (_isReversed) {
+                _curElementId = myArrayPtr->size() - 1;
+//                curPtr =  (myArrayPtr->_data + (myArrayPtr->size() - 1));
+            } else {
+                _curElementId = 0;
+//                curPtr =  (myArrayPtr->_data);
+            }
         }
 
         const T &get() const {
-            return (*myArray)[_curElementId];
+//            return *curPtr;
+            return (*myArrayPtr)[_curElementId];
         }
 
         void set(const T &value) {
-            (*myArray)[_curElementId] = value;
+//            *curPtr = value;
+            (*myArrayPtr)[_curElementId] = value;
         }
 
+
         void next() {
-            if (_isReversed) _curElementId--;
-            else _curElementId++;
+//            if (!hasNext()) throw std::exception("Out of iter");
+
+            if (_isReversed) {
+//                curPtr--;
+                _curElementId--;
+            } else {
+//                curPtr++;
+                _curElementId++;
+            }
         }
 
         bool hasNext() const {
-            if (_isReversed) return 0 != _curElementId;
-            else return (myArray->size()) != (_curElementId);
+            if (_isReversed) return -1 < _curElementId;
+            else return (myArrayPtr->size()) > (_curElementId);
         }
 
     };
