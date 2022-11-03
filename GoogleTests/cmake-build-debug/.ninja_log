@@ -1,0 +1,6 @@
+# ninja log v5
+5	698	6891108262825940	lib/googletest/CMakeFiles/gtest_main.dir/src/gtest_main.cc.obj	6902f09b40c6bca9
+0	705	6891108262905961	CMakeFiles/GoogleTests_run.dir/MyArrayTests.obj	a4fe05553dfb189f
+3	1446	6891108270299184	lib/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.obj	83cfe0c57676e80b
+1452	1518	6891108270979342	lib/gtest.lib	aeb66a2baec5eecf
+1518	1544	6891108271309422	lib/gtest_main.lib	3aa4fa19f4c436d2

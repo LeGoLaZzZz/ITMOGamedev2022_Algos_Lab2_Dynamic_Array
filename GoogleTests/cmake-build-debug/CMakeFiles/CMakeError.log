@@ -1,0 +1,11 @@
+Determining if the include file pthread.h exists failed with the following output:
+Change Dir: F:/RiderProjects/ITMO/Algoritms1sem/Lab2Array/GoogleTests/cmake-build-debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Users/manat/AppData/Local/JetBrains/Toolbox/apps/CLion/ch-0/221.5921.27/bin/ninja/win/ninja.exe cmTC_3d522 && [1/2] Building C object CMakeFiles\cmTC_3d522.dir\CheckIncludeFile.c.obj
+FAILED: CMakeFiles/cmTC_3d522.dir/CheckIncludeFile.c.obj 
+C:\PROGRA~1\MICROS~1\2022\COMMUN~1\VC\Tools\MSVC\1432~1.313\bin\Hostx86\x86\cl.exe  /nologo   /DWIN32 /D_WINDOWS /W3  /MDd /Zi /Ob0 /Od /RTC1 /showIncludes /FoCMakeFiles\cmTC_3d522.dir\CheckIncludeFile.c.obj /FdCMakeFiles\cmTC_3d522.dir\ /FS -c F:\RiderProjects\ITMO\Algoritms1sem\Lab2Array\GoogleTests\cmake-build-debug\CMakeFiles\CMakeTmp\CheckIncludeFile.c
+F:\RiderProjects\ITMO\Algoritms1sem\Lab2Array\GoogleTests\cmake-build-debug\CMakeFiles\CMakeTmp\CheckIncludeFile.c(1): fatal error C1083: Не удается открыть файл включение: pthread.h: No such file or directory,
+ninja: build stopped: subcommand failed.
+
+
+
