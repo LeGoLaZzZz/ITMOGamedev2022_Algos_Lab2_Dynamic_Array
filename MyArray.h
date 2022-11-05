@@ -209,23 +209,23 @@ public:
         return _capacity;
     }
 
-
-    class Iterator {
+    class AbstractIterator {
+    protected:
         int _curElementId;
         bool _isReversed;
         MyArray<T> *myArrayPtr;
         T *curPtr;
 
     public:
-        Iterator(MyArray<T> *other, bool isReversed) {
+        AbstractIterator(MyArray<T> *other, bool isReversed) {
             myArrayPtr = other;
             _isReversed = isReversed;
             if (_isReversed) {
                 _curElementId = myArrayPtr->size() - 1;
-                curPtr =  (myArrayPtr->_data + (myArrayPtr->size() - 1));
+                curPtr = (myArrayPtr->_data + (myArrayPtr->size() - 1));
             } else {
                 _curElementId = 0;
-                curPtr =  (myArrayPtr->_data);
+                curPtr = (myArrayPtr->_data);
             }
         }
 
@@ -233,12 +233,6 @@ public:
             return *curPtr;
 //            return (*myArrayPtr)[_curElementId];
         }
-
-        void set(const T &value) {
-            *curPtr = value;
-//            (*myArrayPtr)[_curElementId] = value;
-        }
-
 
         void next() {
             if (!hasNext()) throw std::exception("Out of iter");
@@ -259,12 +253,38 @@ public:
 
     };
 
+    class ConstIterator : public AbstractIterator {
+    public:
+        ConstIterator(MyArray<T> *other, bool isReversed) : AbstractIterator(other, isReversed) {
+        }
+    };
+
+    class Iterator : public AbstractIterator {
+
+    public:
+        Iterator(MyArray<T> *other, bool isReversed) : AbstractIterator(other, isReversed) {
+        }
+
+        void set(const T &value) {
+            *curPtr = value;
+//            (*myArrayPtr)[_curElementId] = value;
+        }
+    };
+
     Iterator iterator() {
         return Iterator(this, false);
     }
 
+    ConstIterator constIterator() {
+        return ConstIterator(this, false);
+    }
+
     Iterator reverseIterator() {
         return Iterator(this, true);
+    }
+
+    ConstIterator constReverseIterator() {
+        return ConstIterator(this, true);
     }
 
 };

@@ -10,11 +10,12 @@ int main() {
     b.insert(2);
     b.insert(3);
 
-    for (auto it = b.iterator(); it.hasNext(); it.next())
+    for (auto it = b.constIterator(); it.hasNext(); it.next())
         std::cout << it.get() << std::endl;
+
     b.remove(0);
 
-    for (auto it = b.iterator(); it.hasNext(); it.next())
+    for (auto it = b.constIterator(); it.hasNext(); it.next())
         std::cout << it.get() << std::endl;
 
 

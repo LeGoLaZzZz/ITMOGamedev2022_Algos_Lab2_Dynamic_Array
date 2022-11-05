@@ -24,6 +24,7 @@ protected:  // You should make the members protected s.t. they can be
         MyArray<T> a;
         EXPECT_EQ(0, a.size());
         EXPECT_EQ(8, a.capacity());
+
     }
 
     template<typename T>
@@ -190,6 +191,7 @@ protected:  // You should make the members protected s.t. they can be
         EXPECT_EQ(size * 2, a.capacity());
         a.insert(items[0]);
         EXPECT_EQ(size * 4, a.capacity());
+
     }
 
 
