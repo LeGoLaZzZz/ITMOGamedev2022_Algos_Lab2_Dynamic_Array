@@ -9,6 +9,7 @@ class MyArray final {
     T *_data;
     int _size;
     int _capacity;
+    const int _expandCapacityModifier = 2;
 
 public:
 
@@ -113,7 +114,7 @@ public:
     int insert(const T &value) {
 
         if (_size == _capacity) {
-            _capacity *= 2;
+            _capacity *= _expandCapacityModifier;
 
             T *p = (T *) malloc((_capacity) * sizeof(T));
             for (int i = 0; i < size(); ++i) {
@@ -137,7 +138,7 @@ public:
     int insert(int index, const T &value) {
 
         if (_size == _capacity) {
-            _capacity *= 2;
+            _capacity *= _expandCapacityModifier;
 
             T *p = (T *) malloc((_capacity) * sizeof(T));
 
@@ -213,7 +214,7 @@ public:
         int _curElementId;
         bool _isReversed;
         MyArray<T> *myArrayPtr;
-//        T *curPtr;
+        T *curPtr;
 
     public:
         Iterator(MyArray<T> *other, bool isReversed) {
@@ -221,32 +222,32 @@ public:
             _isReversed = isReversed;
             if (_isReversed) {
                 _curElementId = myArrayPtr->size() - 1;
-//                curPtr =  (myArrayPtr->_data + (myArrayPtr->size() - 1));
+                curPtr =  (myArrayPtr->_data + (myArrayPtr->size() - 1));
             } else {
                 _curElementId = 0;
-//                curPtr =  (myArrayPtr->_data);
+                curPtr =  (myArrayPtr->_data);
             }
         }
 
         const T &get() const {
-//            return *curPtr;
-            return (*myArrayPtr)[_curElementId];
+            return *curPtr;
+//            return (*myArrayPtr)[_curElementId];
         }
 
         void set(const T &value) {
-//            *curPtr = value;
-            (*myArrayPtr)[_curElementId] = value;
+            *curPtr = value;
+//            (*myArrayPtr)[_curElementId] = value;
         }
 
 
         void next() {
-//            if (!hasNext()) throw std::exception("Out of iter");
+            if (!hasNext()) throw std::exception("Out of iter");
 
             if (_isReversed) {
-//                curPtr--;
+                curPtr--;
                 _curElementId--;
             } else {
-//                curPtr++;
+                curPtr++;
                 _curElementId++;
             }
         }
@@ -261,13 +262,10 @@ public:
     Iterator iterator() {
         return Iterator(this, false);
     }
-//    ConstIterator iterator() const;
 
     Iterator reverseIterator() {
         return Iterator(this, true);
     }
-//    ConstIterator reverseIterator() const;
-
 
 };
 
