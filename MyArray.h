@@ -81,7 +81,7 @@ public:
 //        return *this;
 //    }
 
-    MyArray &operator=(MyArray &other) {
+    MyArray &operator=(const MyArray &other) {
         if (this != &other) {
             MyArray stackOther = other;
             std::swap(_data, stackOther._data);
