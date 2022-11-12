@@ -82,13 +82,11 @@ public:
 //    }
 
     MyArray &operator=(const MyArray &other) {
-        if (this != &other) {
             MyArray stackOther = other;
             std::swap(_data, stackOther._data);
             std::swap(_size, stackOther._size);
             std::swap(_capacity, stackOther._capacity);
             return *this;
-        }
     }
 
     MyArray &operator=(MyArray &&other) noexcept {
@@ -105,6 +103,7 @@ public:
 
             other._data = nullptr;
             other._size = 0;
+            other._capacity = 0;
 
             return *this;
         }
@@ -164,6 +163,7 @@ public:
             for (int i = index + 1; i < _size + 1; ++i) {
                 new(_data + i) T(std::move(_data[i - 1]));
             }
+            _data[index].~T();
             new(_data + index) T(value);
 
         }
@@ -174,22 +174,14 @@ public:
 
     void remove(int index) {
 
-        T *p = (T *) malloc((_size - 1) * sizeof(T));
-
-        for (int i = 0; i < index; ++i) {
-            new(p + i) T(std::move(_data[i]));
+        if(size()==0){
+            throw std::exception("Array is empty");
         }
 
-        for (int i = index + 1; i < _size; ++i) {
-            new(p + i - 1) T(std::move(_data[i]));
+        for (int i = index; i < _size-1; ++i) {
+            _data[i] = std::move(_data[i+1]);
         }
-
-        for (int i = 0; i < _size; ++i) {
-            _data[i].~T();
-        }
-        free(_data);
-
-        _data = p;
+        _data[_size-1].~T();
         _size -= 1;
     }
 
